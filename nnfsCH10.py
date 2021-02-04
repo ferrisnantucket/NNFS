@@ -52,14 +52,13 @@ class Loss_CategoricalCrossentropy(Loss):
             correct_confidences=np.sum(y_pred_clipped*y_true,axis=1)
         negative_log_likelihoods = -np.log(correct_confidences)
         return negative_log_likelihoods
-
-def backward(self,dvalues,y_true):
-    samples = len(dvalues)
-    labels = len(dvalues[0])
-    if len(y_true.shape)==1:
-        y_true=np.eye(labels)[y_true]
-        self.dinputs=-y_true/dvalues
-        self.dinputs=self.dinputs/samples
+    def backward(self,dvalues,y_true):
+        samples = len(dvalues)
+        labels = len(dvalues[0])
+        if len(y_true.shape)==1:
+            y_true=np.eye(labels)[y_true]
+            self.dinputs=-y_true/dvalues
+            self.dinputs=self.dinputs/samples
 
 class Activation_Softmax_Loss_CategoricalCrossentropy():
     def __init__(self):
@@ -85,11 +84,7 @@ class Optimizer_SGD:
         layer.weights+=-self.learning_rate*layer.dweights
         layer.biases+=-self.learning_rate*layer.dbiases
         
-
-
-
-
-
+        
 X, y=spiral_data(samples=100,classes=3)
 
 dense1=Layer_Dense(2,64)
@@ -100,6 +95,7 @@ loss_activation=Activation_Softmax_Loss_CategoricalCrossentropy()
 optimizer=Optimizer_SGD()
 
 for epoch in range(10001):
+    # Forward pass
     dense1.forward(X)
     activation1.forward(dense1.output)
     dense2.forward(activation1.output)
